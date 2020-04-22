@@ -1,0 +1,43 @@
+{
+  "pages": [
+    "pages/index/main",
+    "pages/active/main",
+    "pages/asked/main",
+    "pages/course/main",
+    "pages/summer/main",
+    "pages/home/main",
+    "pages/paihang/main",
+    "pages/explain/main",
+    "pages/sign/main",
+    "pages/detail/main",
+    "pages/gift/main"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#8ED145",
+    "navigationBarTextStyle": "white"
+  },
+  "tabBar": {
+    "color": "#707070",
+    "selectedColor": "#31C9B2",
+    "list": [
+      {
+        "pagePath": "pages/home/main",
+        "text": "首页",
+        "iconPath": "static/tabs/shouye.png",
+        "selectedIconPath": "static/tabs/shouye-sel.png"
+      },
+      {
+        "pagePath": "pages/paihang/main",
+        "text": "排行",
+        "iconPath": "static/tabs/paihangbang.png",
+        "selectedIconPath": "static/tabs/paihangbang-sel.png"
+      },
+      {
+        "pagePath": "pages/explain/main",
+        "text": "说明",
+        "iconPath": "static/tabs/shuoming.png",
+        "selectedIconPath": "static/tabs/shuoming-sel.png"
+      }
+    ]
+  }
+}
