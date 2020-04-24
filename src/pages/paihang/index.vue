@@ -4,8 +4,8 @@
     <div class="lastTime">
       <span>{{ endTime }} 结束</span>
       <span>
-        剩余
-        <CTime :endTime="endTime"></CTime>
+        <span v-if="isEnd">剩余</span>
+        <CTime :endTime="endTime" :endText="endText" :callback="callback"></CTime>
       </span>
     </div>
     <!-- 票数排行榜 -->
@@ -60,7 +60,11 @@ export default {
   },
   data() {
     return {
+      // 倒计时数据
       endTime: "2020-11-30 00:00:00",
+      endText: "活动已结束",
+      isEnd: true,
+      // 排行数据
       list: [
         {
           id: 1,
@@ -158,6 +162,11 @@ export default {
       third: null,
       newList: []
     };
+  },
+  methods: {
+    callback() {
+      this.isEnd = false;
+    }
   },
   onLoad() {
     this.first = this.list[0];

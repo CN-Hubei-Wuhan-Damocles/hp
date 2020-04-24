@@ -18,9 +18,13 @@
     <div class="voteCount">
       <div class="vote-title">票数贡献榜</div>
       <div class="vote-love">
-        <img src="../../../static/images/love.jpg" />
-        <span>喜欢我的人 在这里驻留</span>
-        <div @click="handleClick3">送ta礼物加票</div>
+        <scroll-view scroll-y="true" scrollbar-face-color="red" class="vote-view">
+          <view id="demo" class="scroll-view-item demo-text">
+            <img src="../../../static/images/love.jpg" />
+            <span>喜欢我的人 在这里驻留</span>
+            <div @click="handleClick3">送ta礼物加票</div>
+          </view>
+        </scroll-view>
       </div>
     </div>
     <!-- 投票记录 -->
@@ -184,24 +188,35 @@ export default {
   background-color: rgb(157, 248, 72);
 }
 .vote-love {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 500rpx;
   background-color: rgb(253, 249, 250);
-  align-items: center;
   margin-top: 20rpx;
-  border-right: 5px solid rgb(209, 209, 0);
   box-sizing: border-box;
 }
-.vote-love > img {
+.vote-view {
+  height: 500rpx;
+  width: 100%;
+}
+.scroll-view-item {
+  height: 1000rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+::-webkit-scrollbar {
+  background-color: red;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: yellow;
+}
+.vote-love img {
   width: 200rpx;
   height: 200rpx;
 }
-.vote-love > span {
+.vote-love span {
   font-size: 24rpx;
 }
-.vote-love > div {
+.vote-love div {
   width: 70%;
   height: 90rpx;
   line-height: 90rpx;

@@ -39,5 +39,8 @@
         "selectedIconPath": "static/tabs/shuoming-sel.png"
       }
     ]
-  }
+  },
+  "requiredBackgroundModes": [
+    "audio"
+  ]
 }

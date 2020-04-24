@@ -8,6 +8,10 @@
       :interval="interval"
       :duration="duration"
     ></Swiper>
+    <!-- 音乐 -->
+    <div class="music" @click="changeMusic">
+      <img :src="isStart?'../../static/music/music-start.png':'../../static/music/music-stop.png'" />
+    </div>
     <!-- 内容 -->
     <div class="sign-container">
       <!-- 数据展示 -->
@@ -34,12 +38,12 @@
       </div>
       <!-- 活动倒计时 -->
       <div class="ctime">
-        距离活动结束：
-        <CTime :endTime="countdown"></CTime>
+        <span v-if="isEnd">距离活动结束：</span>
+        <CTime :endTime="countdown" :endText="endText" :callback="callback"></CTime>
       </div>
       <!-- 搜索 -->
       <div class="search">
-        <input class="weui-input" auto-focus placeholder="姓名" />
+        <input class="weui-input" placeholder="姓名" />
         <div>搜索</div>
       </div>
       <!-- 分组 -->
@@ -143,7 +147,11 @@ export default {
         }
       ],
       // 倒计时时间
-      countdown: "2020-06-01 00:00:00"
+      countdown: "2020-06-01 00:00:00",
+      endText: "活动已结束",
+      isEnd: true,
+      // 播放暂停音乐
+      isStart: false
     };
   },
   methods: {
@@ -160,12 +168,60 @@ export default {
       wx.navigateTo({
         url: "../sign/main"
       });
+    },
+    // 倒计时回调函数
+    callback() {
+      this.isEnd = false;
+    },
+    // 音乐播放暂停
+    changeMusic() {
+      this.isStart = !this.isStart;
+      if (this.isStart) {
+        wx.playBackgroundAudio({
+          dataUrl:
+            "https://webfs.yun.kugou.com/202004230854/b5bf74f75ef406c7a17fa8884d0270d0/G160/M01/13/01/gJQEAFzOfj6AB-G3AEY-Nh4WlZc765.mp3",
+          title: "Amier-STAND-ALONE",
+          coverImgUrl:
+            "https://p3fx.kgimg.com/stdmusic/20190505/20190505141314687331.jpg"
+        });
+      } else {
+        wx.pauseBackgroundAudio();
+      }
+    },
+    // 后台音乐状态监听
+    onMusicState() {
+      let _this = this;
+      // 后台音乐暂停
+      wx.onBackgroundAudioPause(() => {
+        _this.isStart = false;
+      });
+      // 后台音乐播放
+      wx.onBackgroundAudioPlay(() => {
+        _this.isStart = true;
+      });
+      // 后台音乐状态
+      wx.getBackgroundAudioPlayerState({
+        success(res) {
+          const status = res.status;
+          if (status == 1) {
+            _this.isStart = true;
+          } else {
+            _this.isStart = false;
+          }
+        }
+      });
     }
   },
   components: {
     Swiper,
     Item,
     CTime
+  },
+  onLoad() {
+    this.changeMusic();
+  },
+  onShow() {
+    this.onMusicState();
   }
 };
 </script>
@@ -173,6 +229,7 @@ export default {
 <style scoped>
 .home-container {
   background-color: #eeeeee;
+  position: relative;
 }
 .sign-container {
   padding: 20rpx;
@@ -296,5 +353,25 @@ export default {
 }
 .btn3 {
   bottom: 50rpx;
+}
+.music {
+  width: 100rpx;
+  height: 100rpx;
+  position: absolute;
+  top: 50rpx;
+  right: 15rpx;
+  animation: rotate 3s linear infinite;
+}
+.music > img {
+  width: 100%;
+  height: 100%;
+}
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>

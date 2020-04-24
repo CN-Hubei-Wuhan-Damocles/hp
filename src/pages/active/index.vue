@@ -61,17 +61,17 @@ export default {
     };
   },
   methods: {
-    handleClick(){
-      wx.navigateBack({
-        delta:1
-      })
+    handleClick() {
+      wx.navigateTo({
+        url: "../index/main"
+      });
     },
-    toTabbar(){
+    toTabbar() {
       wx.switchTab({
-        url:"../home/main"
-      })
+        url: "../home/main"
+      });
     }
-  },
+  }
 };
 </script>
 
