@@ -10,7 +10,16 @@
     "pages/explain/main",
     "pages/sign/main",
     "pages/detail/main",
-    "pages/gift/main"
+    "pages/gift/main",
+    "pages/asked/select1/main",
+    "pages/asked/select2/main",
+    "pages/asked/select3/main",
+    "pages/asked/select4/main",
+    "pages/asked/select5/main",
+    "pages/asked/select6/main",
+    "pages/asked/select7/main",
+    "pages/asked/select8/main",
+    "pages/asked/select9/main"
   ],
   "window": {
     "navigationBarBackgroundColor": "#8ED145",

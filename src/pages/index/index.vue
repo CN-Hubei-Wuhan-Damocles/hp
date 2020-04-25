@@ -78,7 +78,7 @@ export default {
       })
     },
     hanleClick2(){
-      wx.navigateTo({
+      wx.reLaunch({
         url:"../asked/main"
       })
     },

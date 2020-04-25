@@ -189,25 +189,19 @@ export default {
 }
 .vote-love {
   background-color: rgb(253, 249, 250);
-  margin-top: 20rpx;
-  box-sizing: border-box;
+  padding-top: 20rpx;
 }
 .vote-view {
   height: 500rpx;
   width: 100%;
+  border-right: 5px solid rgb(209, 209, 0);
+  box-sizing: border-box;
 }
 .scroll-view-item {
   height: 1000rpx;
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-::-webkit-scrollbar {
-  background-color: red;
-}
-
-::-webkit-scrollbar-thumb {
-  background-color: yellow;
 }
 .vote-love img {
   width: 200rpx;
