@@ -23,8 +23,8 @@
 	},
 	"miniprogramRoot": "dist/wx/",
 	"compileType": "miniprogram",
-	"appid": "wx663666a27af8690d",
-	"projectname": "hp",
+	"appid": "wx07c16a86468ddc2f",
+	"projectname": "hongpeng",
 	"simulatorType": "wechat",
 	"simulatorPluginLibVersion": {},
 	"condition": {

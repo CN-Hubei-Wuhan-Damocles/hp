@@ -70,7 +70,22 @@ export default {
       wx.switchTab({
         url: "../home/main"
       });
+    },
+    getActiveData() {
+      this.$fly.post(this.$api.active).then(res => {
+        let data = res.data.data[0];
+        console.log(res.data.data[0]);
+        // 活动数据
+        if (data.name.length > 8) {
+          data.name = data.name.substring(0, 8) + "...";
+        }
+        this.arr[0].name = data.name;
+        this.arr[0].count = data.browse;
+      });
     }
+  },
+  onLoad() {
+    this.getActiveData();
   }
 };
 </script>

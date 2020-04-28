@@ -69,6 +69,16 @@ export default {
       console.log(this.globalData);
       console.log(e.mp.detail.value);
       console.log(this.dateYear + this.dateMonth + this.date);
+      wx.showToast({
+        title: "提交成功",
+        icon: "success",
+        duration: 2000
+      });
+      setTimeout(() => {
+        wx.reLaunch({
+          url: "../../luck/main"
+        });
+      }, 2000);
     },
     bindDateChange(e) {
       let value = e.mp.detail.value;

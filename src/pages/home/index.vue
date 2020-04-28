@@ -38,13 +38,13 @@
       </div>
       <!-- 活动倒计时 -->
       <div class="ctime">
-        <span v-if="isEnd">距离活动结束：</span>
-        <CTime :endTime="countdown" :endText="endText" :callback="callback"></CTime>
+        <span>距离活动结束：</span>
+        <CTime :endTime="end" :endText="endText" :callback="callback"></CTime>
       </div>
       <!-- 搜索 -->
       <div class="search">
-        <input class="weui-input" placeholder="姓名" />
-        <div>搜索</div>
+        <input class="weui-input" placeholder="姓名" v-model="fullName" />
+        <div @click="searchPer">搜索</div>
       </div>
       <!-- 分组 -->
       <div class="select">
@@ -146,12 +146,13 @@ export default {
           view: 536
         }
       ],
-      // 倒计时时间
-      countdown: "2020-06-01 00:00:00",
+      end: "2020-08-30 00:00:00",
       endText: "活动已结束",
-      isEnd: true,
       // 播放暂停音乐
-      isStart: false
+      isStart: false,
+      musicUrl: "",
+      // 搜索姓名
+      fullName: ""
     };
   },
   methods: {
@@ -176,13 +177,10 @@ export default {
     // 音乐播放暂停
     changeMusic() {
       this.isStart = !this.isStart;
+      let _this = this;
       if (this.isStart) {
         wx.playBackgroundAudio({
-          dataUrl:
-            "https://webfs.yun.kugou.com/202004230854/b5bf74f75ef406c7a17fa8884d0270d0/G160/M01/13/01/gJQEAFzOfj6AB-G3AEY-Nh4WlZc765.mp3",
-          title: "Amier-STAND-ALONE",
-          coverImgUrl:
-            "https://p3fx.kgimg.com/stdmusic/20190505/20190505141314687331.jpg"
+          dataUrl: _this.musicUrl
         });
       } else {
         wx.pauseBackgroundAudio();
@@ -210,6 +208,41 @@ export default {
           }
         }
       });
+    },
+    // home页面接口数据
+    getHomeData() {
+      this.$fly
+        .post(this.$api.index, {
+          activityId: 1
+        })
+        .then(res => {
+          console.log(res.data.data.hdActivity);
+          let data = res.data.data.hdActivity;
+          // 倒计时
+          this.end = data.end;
+          // 音乐
+          this.musicUrl = data.music;
+          // 报名数据
+          this.vote = data.sumVote;
+          this.view = data.browse;
+          this.count = data.enroll;
+          // 获取音乐路径数据后再调用音乐播放监听
+          this.$nextTick(() => {
+            this.changeMusic();
+          });
+        });
+    },
+    // 搜索成员
+    searchPer() {
+      this.$fly
+        .post(this.$api.search, {
+          activityId: 1,
+          groupId: 1,
+          name: this.fullName
+        })
+        .then(res => {
+          console.log(res);
+        });
     }
   },
   components: {
@@ -218,7 +251,7 @@ export default {
     CTime
   },
   onLoad() {
-    this.changeMusic();
+    this.getHomeData();
   },
   onShow() {
     this.onMusicState();
@@ -273,6 +306,7 @@ export default {
   color: #999999;
   background-color: #fff;
   margin-top: 40rpx;
+  font-size: 28rpx;
 }
 .search {
   display: flex;
@@ -288,6 +322,7 @@ export default {
   background-color: white;
   text-indent: 0.6em;
   padding-left: 40rpx;
+  color: #333333;
   caret-color: #cccccc;
 }
 .search > div {
@@ -344,6 +379,7 @@ export default {
   color: #999;
   position: fixed;
   left: 0rpx;
+  z-index: 99;
 }
 .btn1 {
   bottom: 230rpx;

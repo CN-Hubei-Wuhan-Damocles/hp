@@ -1,7 +1,5 @@
 <template>
-  <span :endTime="endTime" :callback="callback" :endText="endText">
-    {{content}}
-  </span>
+  <span :endTime="endTime" :callback="callback" :endText="endText">{{content}}</span>
 </template>
 <script>
 export default {
@@ -24,7 +22,7 @@ export default {
       default: ""
     }
   },
-  mounted() {
+  updated() {
     this.countdowm(this.endTime);
   },
   methods: {

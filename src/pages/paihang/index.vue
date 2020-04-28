@@ -4,7 +4,7 @@
     <div class="lastTime">
       <span>{{ endTime }} 结束</span>
       <span>
-        <span v-if="isEnd">剩余</span>
+        <span>剩余</span>
         <CTime :endTime="endTime" :endText="endText" :callback="callback"></CTime>
       </span>
     </div>
@@ -63,7 +63,6 @@ export default {
       // 倒计时数据
       endTime: "2020-11-30 00:00:00",
       endText: "活动已结束",
-      isEnd: true,
       // 排行数据
       list: [
         {
@@ -166,9 +165,21 @@ export default {
   methods: {
     callback() {
       this.isEnd = false;
+    },
+    getData() {
+      this.$fly
+        .post(this.$api.index, {
+          activityId: 1
+        })
+        .then(res => {
+          // console.log(res.data.data.hdActivity);
+          let data = res.data.data.hdActivity;
+          this.endTime = data.end;
+        });
     }
   },
   onLoad() {
+    this.getData();
     this.first = this.list[0];
     this.second = this.list[1];
     this.third = this.list[2];
