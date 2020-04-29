@@ -4,6 +4,9 @@
     <span>{{ name }}</span>
     <span>{{ count }}票</span>
     <button type="default">投票</button>
+    <div class="itemId">
+      <span>编号:{{ id }}</span>
+    </div>
   </div>
 </template>
 
@@ -29,10 +32,11 @@ export default {
   background-color: #fff;
   font-size: 32rpx;
   margin-top: 20rpx;
+  position: relative;
 }
 .itemContainer img {
   width: 100%;
-  height: 350rpx;
+  height: 380rpx;
 }
 .itemContainer button {
   width: 90%;
@@ -45,12 +49,25 @@ export default {
   margin-top: 10rpx;
   margin-bottom: 15rpx;
 }
-.itemContainer span {
+.itemContainer > span {
   margin-left: 16rpx;
   display: inline-block;
   margin-top: 10rpx;
 }
 .itemContainer span:nth-child(3) {
   color: rgb(49, 201, 177);
+}
+.itemId {
+  position: absolute;
+  top: 0rpx;
+  left: 0rpx;
+  z-index: 99;
+  width: 140rpx;
+  height: 60rpx;
+  line-height: 60rpx;
+  background-color: rgb(0, 0, 0);
+  color: white;
+  opacity: 0.4;
+  text-align: center;
 }
 </style>

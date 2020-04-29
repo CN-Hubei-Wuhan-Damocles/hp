@@ -76,10 +76,10 @@ export default {
         let data = res.data.data[0];
         console.log(res.data.data[0]);
         // 活动数据
-        if (data.name.length > 8) {
-          data.name = data.name.substring(0, 8) + "...";
-        }
         this.arr[0].name = data.name;
+        if (this.arr[0].name.length > 8) {
+          this.arr[0].name = this.arr[0].name.substring(0, 8) + "...";
+        }
         this.arr[0].count = data.browse;
       });
     }

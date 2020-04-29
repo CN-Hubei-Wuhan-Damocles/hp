@@ -3,7 +3,7 @@
     <!-- 选手信息 -->
     <div class="detailTop" id="giftPer">
       <div class="detail-img">
-        <img :src="detailObj.img"/>
+        <img :src="detailObj.coverImg"/>
       </div>
       <div class="detail-name">{{ detailObj.name }}</div>
     </div>
@@ -16,7 +16,7 @@
       </div>
       <!-- 票数 -->
       <div>
-        <span>{{ detailObj.count }}</span>
+        <span>{{ detailObj.ticket }}</span>
         <span>票数</span>
       </div>
       <!-- 礼物 -->
@@ -26,7 +26,7 @@
       </div>
       <!-- 浏览量 -->
       <div>
-        <span>{{ detailObj.view }}</span>
+        <span>{{ detailObj.browse }}</span>
         <span>浏览量</span>
       </div>
     </div>

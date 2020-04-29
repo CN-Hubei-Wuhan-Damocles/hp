@@ -1,12 +1,11 @@
 {
   "pages": [
-    "pages/home/main",
     "pages/index/main",
     "pages/active/main",
     "pages/asked/main",
     "pages/course/main",
     "pages/summer/main",
-    
+    "pages/home/main",
     "pages/paihang/main",
     "pages/explain/main",
     "pages/sign/main",

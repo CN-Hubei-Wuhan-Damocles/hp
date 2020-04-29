@@ -5,13 +5,15 @@
     <!-- 选手描述 -->
     <div class="detail-per">
       <div class="detail-per-title">选手描述</div>
-      <div class="detail-des">这个人很懒什么都没有留下~</div>
+      <div class="detail-des">
+        <span>{{ detailObj.describes?detailObj.describes:"这人很懒什么都没有留下~" }}</span>
+      </div>
     </div>
     <!-- 选手照片 -->
     <div class="detail-per">
       <div class="detail-per-title">选手照片</div>
       <div class="detail-per-img">
-        <img :src="detailObj.img" />
+        <img :src="detailObj.coverImg" />
       </div>
     </div>
     <!-- 选手票数贡献榜 -->
@@ -73,45 +75,10 @@ export default {
   data() {
     return {
       // 分组数据
-      list: [
-        {
-          id: 1,
-          img: "../../static/images/item1.png",
-          name: "罗仪",
-          count: 33,
-          rank: 6,
-          gift: 0,
-          view: 1065
-        },
-        {
-          id: 2,
-          img: "../../static/images/item2.png",
-          name: "k9506张锦泽",
-          count: 7,
-          rank: 15,
-          gift: 0,
-          view: 253
-        },
-        {
-          id: 3,
-          img: "../../static/images/item3.png",
-          name: "k9507骆鑫",
-          count: 0,
-          rank: 20,
-          gift: 0,
-          view: 100
-        },
-        {
-          id: 4,
-          img: "../../static/images/item4.png",
-          name: "k9906班高铁言",
-          count: 2,
-          rank: 12,
-          gift: 0,
-          view: 536
-        }
-      ],
-      detailObj: null,
+      list: [],
+      detailObj: {
+        describes: ""
+      },
       // 投票记录
       voteList: [
         { id: 1, name: "undefined", cTime: "2019-12-27 10:24:28" },
@@ -136,11 +103,22 @@ export default {
       wx.navigateTo({
         url: `../gift/main?id=${_this.detailObj.id}`
       });
+    },
+    // 全部成员数据
+    getList(id) {
+      this.$fly
+        .post(this.$api.allList, {
+          activityId: 1
+        })
+        .then(res => {
+          this.list = res.data.rows;
+          this.detailObj = this.list.find(item => item.id == id);
+        });
     }
   },
   onLoad(options) {
     let id = options.id;
-    this.detailObj = this.list.find(item => item.id == id);
+    this.getList(id);
   }
 };
 </script>
@@ -164,10 +142,10 @@ export default {
 }
 .detail-des {
   width: 100%;
-  height: 140rpx;
   background-color: #fff;
-  padding: 30rpx 0rpx 0rpx 15rpx;
+  padding: 30rpx 15rpx 60rpx 15rpx;
   box-sizing: border-box;
+  text-align: justify;
 }
 .detail-per-img {
   padding: 20rpx;
@@ -176,7 +154,7 @@ export default {
 }
 .detail-per-img > img {
   width: 100%;
-  height: 650rpx;
+  height: 800rpx;
 }
 .voteCount {
   margin-top: 40rpx;

@@ -116,13 +116,15 @@ export default {
       let _this = this;
       wx.getSetting({
         success(res) {
-          // 用户是否授权---获取用户信息
+          // 用户是否已经授权登录
           if (res.authSetting["scope.userInfo"]) {
             console.log("用户授权了");
             // 切换隐藏页面
             _this.isHide = !_this.isHide;
           } else {
             console.log("用户没有授权");
+            //如果用户没有授权登录过，就要通过wx.login获取用户标识符openId
+            _this.getOpenId();
           }
         }
       });
@@ -134,8 +136,9 @@ export default {
         //用户按了确定按钮
         // 切换隐藏页面
         this.isHide = !this.isHide;
-        // 获取用户唯一标识openId，放入本地缓存
-        this.getOpenId();
+        // 同时将用户信息和openId数据一起返回给后台
+        let openid = Store.getItem("openid");
+        console.log(openid);
       } else {
         //用户按了取消按钮
         wx.showModal({
@@ -163,7 +166,6 @@ export default {
                 code: res.code
               })
               .then(res => {
-                console.log(res);
                 // 将openId存储到本地缓存
                 let id = res.data.data.openid;
                 Store.setItem("openid", id);
@@ -173,10 +175,25 @@ export default {
           }
         }
       });
+    },
+    // 开启分享
+    startShare() {
+      wx.showShareMenu({
+        withShareTicket: true
+      });
     }
+  },
+  // 分享功能 ---要写在method外面
+  onShareAppMessage(res) {
+    return {
+      title: "一起搞活动",
+      path: "/pages/index/main"
+    };
   },
   onLoad() {
     this.isLogin();
+    // 开启页面分享
+    this.startShare();
   }
 };
 </script>

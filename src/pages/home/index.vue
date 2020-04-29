@@ -56,7 +56,7 @@
       <!-- 分组内容 -->
       <div class="contentWrap">
         <block v-for="item in list" :key="key">
-          <Item :img="item.img" :count="item.count" :name="item.name" :id="item.id"></Item>
+          <Item :img="item.coverImg" :count="item.ticket" :name="item.name" :id="item.id"></Item>
         </block>
       </div>
       <!-- 底部 -->
@@ -105,47 +105,13 @@ export default {
         "北大青鸟光谷学院",
         "课工场华中直营总校",
         "课工场徐东校区",
-        "课工场光谷校区"
+        "课工场光谷校区",
+        "课工场郑州兰德校区",
+        "北大青鸟徐东校区"
       ],
       // 分组数据
-      list: [
-        {
-          id: 1,
-          img: "../../static/images/item1.png",
-          name: "罗仪",
-          count: 33,
-          rank: 6,
-          gift: 0,
-          view: 1065
-        },
-        {
-          id: 2,
-          img: "../../static/images/item2.png",
-          name: "k9506张锦泽",
-          count: 7,
-          rank: 15,
-          gift: 0,
-          view: 253
-        },
-        {
-          id: 3,
-          img: "../../static/images/item3.png",
-          name: "k9507骆鑫",
-          count: 0,
-          rank: 20,
-          gift: 0,
-          view: 100
-        },
-        {
-          id: 4,
-          img: "../../static/images/item4.png",
-          name: "k9906班高铁言",
-          count: 2,
-          rank: 12,
-          gift: 0,
-          view: 536
-        }
-      ],
+      list: [], // 遍历数据，根据分组不同数据不同
+      beforeList: [], // 存放接口数据
       end: "2020-08-30 00:00:00",
       endText: "活动已结束",
       // 播放暂停音乐
@@ -156,8 +122,16 @@ export default {
     };
   },
   methods: {
+    // 分组显示数据
     bindPickerChange(e) {
       this.index = e.mp.detail.value;
+      let value = this.array[this.index];
+      if (value == "选择分组") {
+        this.list = this.beforeList;
+      } else {
+        this.list = this.beforeList.filter(item => item.groupName == value);
+      }
+      this.fullName = "";
     },
     handleClick1() {
       wx.navigateTo({
@@ -216,8 +190,8 @@ export default {
           activityId: 1
         })
         .then(res => {
-          console.log(res.data.data.hdActivity);
           let data = res.data.data.hdActivity;
+          // console.log(data);
           // 倒计时
           this.end = data.end;
           // 音乐
@@ -232,17 +206,25 @@ export default {
           });
         });
     },
-    // 搜索成员
-    searchPer() {
+    // 全部成员数据
+    getList() {
       this.$fly
-        .post(this.$api.search, {
-          activityId: 1,
-          groupId: 1,
-          name: this.fullName
+        .post(this.$api.allList, {
+          activityId: 1
         })
         .then(res => {
-          console.log(res);
+          console.log(res.data.rows);
+          this.beforeList = res.data.rows; // 存放数据
+          this.list = this.beforeList; // 显示数据 根据分组显示不同数据
         });
+    },
+    // 搜索成员
+    searchPer() {
+      if (this.fullName) {
+        this.list = this.beforeList.filter(item => {
+          return item.name.match(this.fullName);
+        });
+      }
     }
   },
   components: {
@@ -252,6 +234,7 @@ export default {
   },
   onLoad() {
     this.getHomeData();
+    this.getList();
   },
   onShow() {
     this.onMusicState();
@@ -306,7 +289,7 @@ export default {
   color: #999999;
   background-color: #fff;
   margin-top: 40rpx;
-  font-size: 28rpx;
+  font-size: 30rpx;
 }
 .search {
   display: flex;
@@ -320,8 +303,8 @@ export default {
   display: block;
   height: 70rpx;
   background-color: white;
-  text-indent: 0.6em;
-  padding-left: 40rpx;
+  text-indent: 0.2em;
+  padding-left: 50rpx;
   color: #333333;
   caret-color: #cccccc;
 }
@@ -341,6 +324,7 @@ export default {
   text-align: center;
   position: relative;
   margin-top: 20rpx;
+  font-size: 28rpx;
 }
 .select img {
   width: 25rpx;

@@ -27,6 +27,10 @@ export default {
   log() {
     console.log(`log at:${Date.now()}`);
   }
+  // 小程序生命周期
+  // onLaunch() {
+  //   console.log("onLaunch");
+  // }
 };
 </script>
 

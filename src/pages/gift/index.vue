@@ -45,45 +45,10 @@ export default {
   data() {
     return {
       // 分组数据
-      list: [
-        {
-          id: 1,
-          img: "../../static/images/item1.png",
-          name: "罗仪",
-          count: 33,
-          rank: 6,
-          gift: 0,
-          view: 1065
-        },
-        {
-          id: 2,
-          img: "../../static/images/item2.png",
-          name: "k9506张锦泽",
-          count: 7,
-          rank: 15,
-          gift: 0,
-          view: 253
-        },
-        {
-          id: 3,
-          img: "../../static/images/item3.png",
-          name: "k9507骆鑫",
-          count: 0,
-          rank: 20,
-          gift: 0,
-          view: 100
-        },
-        {
-          id: 4,
-          img: "../../static/images/item4.png",
-          name: "k9906班高铁言",
-          count: 2,
-          rank: 12,
-          gift: 0,
-          view: 536
-        }
-      ],
-      giftObj: null,
+      list: [],
+      giftObj: {
+        coverImg: ""
+      },
       // 礼物数据
       giftList: [
         {
@@ -221,13 +186,22 @@ export default {
     changeTotal() {
       this.totalPrice = this.giftListObj.price * this.num;
       this.totalCount = this.giftListObj.count * this.num;
+    },
+    // 全部成员数据
+    getList(id) {
+      this.$fly
+        .post(this.$api.allList, {
+          activityId: 1
+        })
+        .then(res => {
+          this.list = res.data.rows;
+          this.giftObj = this.list.find(item => item.id == id);
+        });
     }
   },
   onLoad(options) {
-    // let id = options.id;
-    let id = 1;
-    // 初始化
-    this.giftObj = this.list.find(item => item.id == id); // 人物数据对象
+    let id = options.id;
+    this.getList(id);
     this.handleClick();
   }
 };
