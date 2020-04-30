@@ -15,7 +15,7 @@
         <li class="hot" v-for="item in arr" :key="key" @click="toTabbar">
           <span>{{ item.id }}</span>
           <span>{{ item.name}}</span>
-          <span>{{ item.count}}</span>
+          <span>{{ item.browse}}</span>
           <img src="../../../static/images/remen.png" alt />
         </li>
       </ul>
@@ -57,7 +57,7 @@ export default {
       interval: 3000,
       duration: 500,
       // 热门
-      arr: [{ id: 1, name: "宏鹏教育程序员美...", count: 6760 }]
+      arr: []
     };
   },
   methods: {
@@ -72,15 +72,14 @@ export default {
       });
     },
     getActiveData() {
+      this.arr = [];
       this.$fly.post(this.$api.active).then(res => {
         let data = res.data.data[0];
-        console.log(res.data.data[0]);
         // 活动数据
-        this.arr[0].name = data.name;
+        this.arr.push(data);
         if (this.arr[0].name.length > 8) {
           this.arr[0].name = this.arr[0].name.substring(0, 8) + "...";
         }
-        this.arr[0].count = data.browse;
       });
     }
   },

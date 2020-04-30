@@ -60,9 +60,9 @@
         </block>
       </div>
       <!-- 底部 -->
-      <div class="foot">已经到底部了~</div>
+      <div class="foot" v-if="isBottom">已经到底部了~</div>
       <!-- 底部图片 -->
-      <div class="footImg">
+      <div class="footImg" v-if="isBottom">
         <img src="../../../static/images/banner.png" />
       </div>
       <!-- 左侧固定按钮 -->
@@ -110,27 +110,38 @@ export default {
         "北大青鸟徐东校区"
       ],
       // 分组数据
-      list: [], // 遍历数据，根据分组不同数据不同
-      beforeList: [], // 存放接口数据
+      list: [], // 遍历数据，根据数据不同显示不同
+      beforeList: [], // 存放全部接口数据
+      pickList: [], // 存放分组数据
+      searchList: [], // 存放搜索数据
       end: "2020-08-30 00:00:00",
       endText: "活动已结束",
       // 播放暂停音乐
       isStart: false,
       musicUrl: "",
       // 搜索姓名
-      fullName: ""
+      fullName: "",
+      // 上拉数据完后显示底部内容
+      isBottom: false,
+      conNum: 0,
+      current: 6, // 每次上拉多显示的数据数
+      // 区分上拉显示的是默认数据，还是分组数据，还是搜索数据
+      pullNum: 0
     };
   },
   methods: {
     // 分组显示数据
     bindPickerChange(e) {
+      this.pullNum = 1; // 改变上拉显示的数据为分组
+      this.conNum = 0;
       this.index = e.mp.detail.value;
       let value = this.array[this.index];
       if (value == "选择分组") {
-        this.list = this.beforeList;
+        this.pickList = this.beforeList;
       } else {
-        this.list = this.beforeList.filter(item => item.groupName == value);
+        this.pickList = this.beforeList.filter(item => item.groupName == value);
       }
+      this.topPull(this.pickList);
       this.fullName = "";
     },
     handleClick1() {
@@ -215,15 +226,31 @@ export default {
         .then(res => {
           console.log(res.data.rows);
           this.beforeList = res.data.rows; // 存放数据
-          this.list = this.beforeList; // 显示数据 根据分组显示不同数据
+          this.topPull(this.beforeList); // 初始数据
         });
     },
     // 搜索成员
     searchPer() {
+      this.index = 0;
+      this.pullNum = 2;
+      this.conNum = 0;
       if (this.fullName) {
-        this.list = this.beforeList.filter(item => {
+        this.searchList = this.beforeList.filter(item => {
           return item.name.match(this.fullName);
         });
+        this.topPull(this.searchList);
+      }
+    },
+    // 上拉加载数据
+    topPull(arr) {
+      this.conNum += this.current;
+      this.list = arr.filter((item, index) => index < this.conNum); // 显示数据 根据分组显示不同数据
+      if (this.conNum > arr.length) {
+        this.isBottom = true;
+        this.conNum = 0;
+        this.pullNum = 3; // 避免无限加载
+      } else {
+        this.isBottom = false;
       }
     }
   },
@@ -238,6 +265,35 @@ export default {
   },
   onShow() {
     this.onMusicState();
+  },
+  // 上拉加载数据独立事件
+  onReachBottom: function() {
+    wx.showLoading({
+      title: "数据加载中..."
+    });
+    if (this.pullNum == 0) {
+      this.topPull(this.beforeList);
+    } else if (this.pullNum == 1) {
+      this.topPull(this.pickList);
+    } else if (this.pullNum == 2) {
+      this.topPull(this.searchList);
+    }
+    setTimeout(() => {
+      wx.hideLoading();
+    }, 1000);
+  },
+  // 下拉刷新页面
+  onPullDownRefresh() {
+    // 初始化内容
+    this.isBottom = false;
+    this.conNum = 0;
+    this.index = 0;
+    this.pullNum = 0;
+    this.fullName = "";
+    this.topPull(this.beforeList);
+    setTimeout(() => {
+      wx.stopPullDownRefresh();
+    }, 1000);
   }
 };
 </script>
@@ -348,9 +404,6 @@ export default {
 .footImg > img {
   width: 100%;
   height: 200rpx;
-}
-.footImg {
-  margin-bottom: 200rpx;
 }
 .btn {
   width: 80rpx;

@@ -83,8 +83,8 @@ export default {
       autoplay: true,
       interval: 3000,
       duration: 500,
-      // 是否登录
-      isHide: true
+      // 是否显示授权页面
+      isHide: false
     };
   },
   components: {
@@ -119,10 +119,10 @@ export default {
           // 用户是否已经授权登录
           if (res.authSetting["scope.userInfo"]) {
             console.log("用户授权了");
-            // 切换隐藏页面
-            _this.isHide = !_this.isHide;
           } else {
             console.log("用户没有授权");
+            // 显示授权页面
+            _this.isHide = !_this.isHide;
             //如果用户没有授权登录过，就要通过wx.login获取用户标识符openId
             _this.getOpenId();
           }
@@ -183,7 +183,7 @@ export default {
       });
     }
   },
-  // 分享功能 ---要写在method外面
+  // 分享功能 ---要写在methods外面---独立事件
   onShareAppMessage(res) {
     return {
       title: "一起搞活动",
