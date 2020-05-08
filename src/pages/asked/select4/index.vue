@@ -102,6 +102,8 @@ export default {
             });
           } else {
             this.globalData.value4_text = this.otherText;
+            // 清空文本框内容
+            this.otherText = "";
             wx.navigateTo({
               url: "../select5/main"
             });
@@ -110,10 +112,16 @@ export default {
       }
     }
   },
+  onLoad() {
+    //初始化
+    this.items.map(item => {
+      item.checked = false;
+    });
+    this.isOther = false;
+  },
   onShow() {
-    // 清空文本框内容
+    // 清除其他选项的文本内容
     delete this.globalData.value4_text;
-    this.otherText = "";
   }
 };
 </script>

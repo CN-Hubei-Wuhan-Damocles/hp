@@ -59,6 +59,12 @@ export default {
         });
       }
     }
+  },
+  onLoad() {
+    //初始化
+    this.items.map(item => {
+      item.checked = false;
+    });
   }
 };
 </script>

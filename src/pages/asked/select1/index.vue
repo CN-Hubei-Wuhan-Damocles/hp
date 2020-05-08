@@ -9,7 +9,7 @@
     </div>
     <div class="selected-content">
       <div class="selected-content-title">
-        <span>1.你选在学习的课程是？ (单选)</span>
+        <span>1.你选择学习的课程是？ (单选)</span>
       </div>
       <div class="selectedBox">
         <radio-group class="radio-group" @change="radioChange">
@@ -69,6 +69,12 @@ export default {
         });
       }
     }
+  },
+  onLoad() {
+    //初始化
+    this.items.map(item => {
+      item.checked = false;
+    });
   }
 };
 </script>

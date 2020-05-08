@@ -40,15 +40,13 @@ export default {
         });
       } else {
         this.globalData.value5 = this.otherText;
+        // 清空文本框内容
+        this.otherText = "";
         wx.navigateTo({
           url: "../select6/main"
         });
       }
     }
-  },
-  onShow() {
-    // 初始化
-    this.otherText = "";
   }
 };
 </script>

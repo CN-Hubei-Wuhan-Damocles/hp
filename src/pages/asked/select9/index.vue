@@ -13,19 +13,19 @@
         <view class="section__title">
           <img src="../../../../static/tabs/xingming.png" />姓名：
         </view>
-        <input name="user" />
+        <input name="user" v-model="user" />
       </view>
       <view class="section">
         <view class="section__title">
           <img src="../../../../static/tabs/dianhua.png" />电话：
         </view>
-        <input name="phone" />
+        <input name="phone" v-model="phone" />
       </view>
       <view class="section section_gap sex">
         <view class="section__title">
           <img src="../../../../static/tabs/weibiaoti--.png" />性别：
         </view>
-        <radio-group name="radio">
+        <radio-group name="radio" @change="radioChange">
           <label>
             <radio value="男" />男
           </label>
@@ -38,7 +38,7 @@
         <view class="section__title">
           <img src="../../../../static/tabs/shengri.png" />出生日期：
         </view>
-        <picker mode="date" start="2015-09-01" end="2017-09-01" @change="bindDateChange">
+        <picker mode="date" start="1990-06-30" end="2020-06-30" @change="bindDateChange">
           <view class="picker">
             {{ dateYear }}年 {{ dateMonth }}月 {{ date }}日
             <img
@@ -61,25 +61,125 @@ export default {
     return {
       dateYear: "----",
       dateMonth: "--",
-      date: "--"
+      date: "--",
+      user: "",
+      phone: null,
+      sex: ""
     };
   },
   methods: {
-    formSubmit(e) {
-      console.log(this.globalData);
-      console.log(e.mp.detail.value);
-      console.log(this.dateYear + this.dateMonth + this.date);
-      wx.showToast({
-        title: "提交成功",
-        icon: "success",
-        duration: 2000
-      });
-      setTimeout(() => {
-        wx.reLaunch({
-          url: "../../luck/main"
+    formSubmit() {
+      let userReg = /^[\u4E00-\u9FA5A-Za-z0-9]+$/; //中文、英文、数字但不包括下划线等符号
+      let phoneReg = /^1[3456789]\d{9}$/; // 11位数字手机号
+      let date = new Date();
+      let newYear = date.getFullYear();
+      if (this.user == "") {
+        wx.showToast({
+          title: "姓名不可以为空",
+          icon: "none",
+          duration: 2000
         });
-      }, 2000);
+      } else if (!userReg.test(this.user)) {
+        wx.showToast({
+          title: "用户名不可以包含符号",
+          icon: "none",
+          duration: 2000
+        });
+      } else if (this.phone == null || this.phone == "") {
+        wx.showToast({
+          title: "手机号不可为空",
+          icon: "none",
+          duration: 2000
+        });
+      } else if (!phoneReg.test(this.phone)) {
+        wx.showToast({
+          title: "手机号有误",
+          icon: "none",
+          duration: 2000
+        });
+      } else if (this.sex == "") {
+        wx.showToast({
+          title: "性别不可为空",
+          icon: "none",
+          duration: 2000
+        });
+      } else if (this.dateYear == "----") {
+        wx.showToast({
+          title: "请选择出生日期",
+          icon: "none",
+          duration: 2000
+        });
+      } else if (newYear - this.dateYear < 16) {
+        wx.showToast({
+          title: "您的年龄小于16岁",
+          icon: "none",
+          duration: 2000
+        });
+      } else {
+        let name = this.user; // 姓名
+        let coursecheckboxs = JSON.stringify(this.globalData.value4); // 选择我们学校的原因
+        let whychoose = this.globalData.value4_text || "";
+        let course = this.globalData.value1; // 选择的课程
+        let checkboxs = JSON.stringify(this.globalData.value2); // 最看重哪些方面
+        let qita = this.globalData.value2_text || "";
+        let ordius = this.globalData.value3; // 报名渠道
+        let why = this.globalData.value3_text || "";
+        let opinion = this.globalData.value5; // 想要获得什么改变
+        let zxordius = this.globalData.value6; // 对咨询是否满意
+        let yuanyin = this.globalData.value6_text || ""; // 不满意的原因
+        let professors = this.globalData.value8; //学历
+        let isfresh = JSON.stringify(
+          this.globalData.value7 == "应届" ? true : false
+        ); //是否是应届生
+        let sex = this.sex; // 性别
+        let born = this.dateYear + "-" + this.dateMonth + "-" + this.date; // 出生日期
+        let tel = this.phone; // 电话
+        this.$fly
+          .post(this.$api.asked, {
+            questionnaireId: 2,
+            name: name,
+            cause: coursecheckboxs + ":" + whychoose,
+            lesson: course,
+            advantage: checkboxs + ":" + qita,
+            place: ordius + ":" + why,
+            changee: opinion,
+            satisfaction: zxordius,
+            negativeComment: yuanyin,
+            education: professors,
+            current: isfresh,
+            sex: sex,
+            birthday: born,
+            tel: tel
+          })
+          .then(res => {
+            if (res.data.success) {
+              // 初始化
+              this.user = "";
+              this.phone = "";
+              this.dateYear = "----";
+              this.dateMonth = "--";
+              this.date = "--";
+              wx.showToast({
+                title: "提交成功",
+                icon: "success",
+                duration: 2000
+              });
+              setTimeout(() => {
+                wx.reLaunch({
+                  url: "../../luck/main"
+                });
+              }, 500);
+            } else {
+              wx.showToast({
+                title: res.data.message,
+                icon: "none",
+                duration: 2000
+              });
+            }
+          });
+      }
     },
+    // 出生日期
     bindDateChange(e) {
       let value = e.mp.detail.value;
       let newdate = new Date(value);
@@ -91,6 +191,10 @@ export default {
       this.dateYear = year;
       this.dateMonth = month;
       this.date = day;
+    },
+    // 性别
+    radioChange(e) {
+      this.sex = e.target.value;
     }
   }
 };

@@ -5,11 +5,11 @@
     <form @submit="formSubmit">
       <view class="section first">
         <view class="section__title">选手名称</view>
-        <input name="user" placeholder="请输入选手名称" type="text" />
+        <input name="user" placeholder="请输入选手名称" type="text" v-model="name" />
       </view>
       <view class="section">
         <view class="section__title">手机号</view>
-        <input name="phone" type="number" placeholder="请输入手机号" />
+        <input name="phone" type="number" placeholder="请输入手机号" v-model="phone" />
       </view>
       <view class="section">
         <view class="section__title">分组</view>
@@ -20,7 +20,7 @@
       </view>
       <view class="section last">
         <view class="section__title">选手描述</view>
-        <textarea placeholder="请输入选手描述" name="textArea" />
+        <textarea placeholder="请输入选手描述" name="textArea" v-model="text" />
       </view>
       <!-- 图片上传 -->
       <div class="signImg">
@@ -53,67 +53,123 @@ export default {
   data() {
     return {
       index: 0,
-      array: [
-        "全部",
-        "北大青鸟鲁广校区",
-        "北大青鸟光谷校区",
-        "北大青鸟光谷学院",
-        "课工场华中直营总校",
-        "课工场徐东校区",
-        "课工场光谷校区"
-      ],
+      array: ["全部"],
+      groupId: [null], // 分组id
       // 上传图片数据
       currentImg: 0,
       arrImg: [],
       // base64图片转码数据
-      toBaseImg: []
+      toBaseImg: [],
+      name: null, //用户名
+      phone: null, // 手机号
+      text: null, // 描述信息
+      userInfo: null // 登录判断
     };
   },
   methods: {
     // 提交
-    formSubmit(e) {
-      let user = e.mp.detail.value.user;
-      let phone = e.mp.detail.value.phone;
+    formSubmit() {
+      let user = this.name;
+      let phone = Number(this.phone);
       let userReg = /^[\u4E00-\u9FA5A-Za-z0-9]+$/; //中文、英文、数字但不包括下划线等符号
       let phoneReg = /^1[3456789]\d{9}$/; // 11位数字手机号
-      // 图片转码
-      let imgs = this.arrImg;
-      imgs.map(item => {
-        this.urlTobase64(item);
-      });
+      let extend;
+      if (this.userInfo == 1) {
+        extend = 0;
+      } else if (this.userInfo == 0) {
+        extend = 1;
+      }
+      // 正则验证
       if (user == "") {
         wx.showToast({
           title: "用户名不可以为空",
           icon: "none",
           duration: 2000
         });
+      } else if (!userReg.test(user)) {
+        wx.showToast({
+          title: "用户名不可以包含符号",
+          icon: "none",
+          duration: 2000
+        });
+      } else if (phone == "") {
+        wx.showToast({
+          title: "手机号不可为空",
+          icon: "none",
+          duration: 2000
+        });
+      } else if (!phoneReg.test(phone)) {
+        wx.showToast({
+          title: "手机号有误",
+          icon: "none",
+          duration: 2000
+        });
+      } else if (this.arrImg.length == 0) {
+        wx.showToast({
+          title: "至少上传一张图片",
+          icon: "none",
+          duration: 2000
+        });
       } else {
-        if (!userReg.test(user)) {
-          wx.showToast({
-            title: "用户名不可以包含符号",
-            icon: "none",
-            duration: 2000
-          });
-        } else {
-          if (phone == "") {
-            wx.showToast({
-              title: "手机号不可为空",
-              icon: "none",
-              duration: 2000
-            });
-          } else {
-            if (!phoneReg.test(phone)) {
+        this.$fly
+          .post(this.$api.sign, {
+            activityId: 1,
+            name: user,
+            tel: phone,
+            describes: this.text,
+            pics: JSON.stringify(this.toBaseImg),
+            extend1: extend,
+            groupId: this.groupId[this.index]
+          })
+          .then(res => {
+            // code等于0时 操作成功
+            if (res.data.code == 0) {
+              console.log(res);
+              // 数据初始化
+              this.index = 0;
+              this.currentImg = 0;
+              this.arrImg = [];
+              this.toBaseImg = [];
+              this.name = null;
+              this.phone = null;
+              this.text = null;
+              // 判断报名是否需要审核
+              if (this.userInfo == 1) {
+                wx.showModal({
+                  title: "提交成功",
+                  content: "本活动报名须进行资料审核，请您耐心等待",
+                  showCancel: false,
+                  success(res) {
+                    if (res.confirm) {
+                      // wx.switchTab({
+                      //   url: "../home/main"
+                      // });
+                    }
+                  }
+                });
+              }
+              if (this.userInfo == 0) {
+                wx.showModal({
+                  title: "提示",
+                  content: "报名成功",
+                  showCancel: false,
+                  success(res) {
+                    if (res.confirm) {
+                      // wx.switchTab({
+                      //   url: "../home/main"
+                      // });
+                    }
+                  }
+                });
+              }
+            } else {
               wx.showToast({
-                title: "手机号有误",
+                title: response.data.msg,
                 icon: "none",
                 duration: 2000
               });
-            } else {
-              e.mp.detail.value.imgs = this.toBaseImg;
-              console.log(e.mp.detail.value);
             }
-          }
-        }
+          });
       }
     },
     // 分组选择
@@ -129,6 +185,8 @@ export default {
           // tempFilePath可以作为img标签的src属性显示图片
           const tempFilePaths = res.tempFilePaths;
           _this.arrImg.push(tempFilePaths[0]); // 数组每一项要为字符串
+          // 图片转码
+          _this.urlTobase64(tempFilePaths[0]);
           _this.currentImg++;
           if (_this.currentImg == 3) {
             wx.showModal({
@@ -170,12 +228,29 @@ export default {
           //把arraybuffer转成base64
           let base64 = wx.arrayBufferToBase64(res.data);
           //不加上这串字符，在页面无法显示的哦
-          base64 = "data:image/jpeg;base64," + base64;
+          base64 = "data:image/png;base64," + base64;
           //打印出base64字符串，可复制到网页校验一下是否是你选择的原图片呢
-          _this.toBaseImg.push(base64);
+          _this.toBaseImg.push({ img: base64 });
         }
       });
+    },
+    // 报名判断--安全验证
+    isLogin() {
+      this.$fly
+        .post(this.$api.isLogin, {
+          activityId: 1
+        })
+        .then(res => {
+          this.userInfo = res.data.data.hdActivity.audit;
+          res.data.data.groupList.map(item => {
+            this.array.push(item.name);
+            this.groupId.push(item.id);
+          });
+        });
     }
+  },
+  onLoad() {
+    this.isLogin();
   }
 };
 </script>

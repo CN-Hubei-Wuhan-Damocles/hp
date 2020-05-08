@@ -224,21 +224,22 @@ export default {
           activityId: 1
         })
         .then(res => {
-          console.log(res.data.rows);
           this.beforeList = res.data.rows; // 存放数据
           this.topPull(this.beforeList); // 初始数据
         });
     },
     // 搜索成员
     searchPer() {
-      this.index = 0;
+      this.index = 0; // 将分组还原
       this.pullNum = 2;
       this.conNum = 0;
       if (this.fullName) {
-        this.searchList = this.beforeList.filter(item => {
-          return item.name.match(this.fullName);
-        });
-        this.topPull(this.searchList);
+        this.$fly
+          .post(this.$api.search, { activityId: 1, name: this.fullName })
+          .then(res => {
+            this.searchList = res.data.rows;
+            this.topPull(this.searchList);
+          });
       }
     },
     // 上拉加载数据

@@ -15,33 +15,33 @@
         <div class="rank-top">
           <div class="rank-second">
             <span>NO.2</span>
-            <img :src="second.img" />
+            <img :src="second.coverImg" />
             <span>{{ second.name }}</span>
-            <span>{{ second.count }}票</span>
+            <span>{{ second.ticket }}票</span>
           </div>
           <div class="rank-first">
             <img src="../../../static/images/best.png" />
-            <img :src="first.img" />
+            <img :src="first.coverImg" />
             <span>{{ first.name }}</span>
             <span>
-              <span>{{ first.count }}</span>票
+              <span>{{ first.ticket }}</span>票
             </span>
           </div>
           <div class="rank-third">
             <span>NO.3</span>
-            <img :src="third.img" />
+            <img :src="third.coverImg" />
             <span>{{ third.name }}</span>
-            <span>{{ third.count }}票</span>
+            <span>{{ third.ticket }}票</span>
           </div>
         </div>
         <ul class="rank-ul">
           <li v-for="(item,index) in newList" class="rankList" :key="key">
             <div class="rank-img">
-              <img :src="item.img" />
+              <img :src="item.coverImg" />
             </div>
             <div class="rank-msg">
               <span>{{ item.name }}</span>
-              <span>{{ item.count }} 票</span>
+              <span>{{ item.ticket }} 票</span>
             </div>
             <span class="ranking">{{ index+4 }}</span>
           </li>
@@ -64,101 +64,9 @@ export default {
       endTime: "2020-11-30 00:00:00",
       endText: "活动已结束",
       // 排行数据
-      list: [
-        {
-          id: 1,
-          img: "../../static/images/item1.png",
-          name: "罗仪",
-          count: 33,
-          rank: 6,
-          gift: 0,
-          view: 1065
-        },
-        {
-          id: 2,
-          img: "../../static/images/item2.png",
-          name: "k9506张锦泽",
-          count: 7,
-          rank: 15,
-          gift: 0,
-          view: 253
-        },
-        {
-          id: 3,
-          img: "../../static/images/item3.png",
-          name: "k9507骆鑫",
-          count: 0,
-          rank: 20,
-          gift: 0,
-          view: 100
-        },
-        {
-          id: 4,
-          img: "../../static/images/item4.png",
-          name: "k9906班高铁言",
-          count: 2,
-          rank: 12,
-          gift: 0,
-          view: 536
-        },
-        {
-          id: 5,
-          img: "../../static/images/item1.png",
-          name: "罗仪",
-          count: 33,
-          rank: 6,
-          gift: 0,
-          view: 1065
-        },
-        {
-          id: 6,
-          img: "../../static/images/item2.png",
-          name: "k9506张锦泽",
-          count: 7,
-          rank: 15,
-          gift: 0,
-          view: 253
-        },
-        {
-          id: 7,
-          img: "../../static/images/item3.png",
-          name: "k9507骆鑫",
-          count: 0,
-          rank: 20,
-          gift: 0,
-          view: 100
-        },
-        {
-          id: 8,
-          img: "../../static/images/item4.png",
-          name: "k9906班高铁言",
-          count: 2,
-          rank: 12,
-          gift: 0,
-          view: 536
-        },
-        {
-          id: 9,
-          img: "../../static/images/item1.png",
-          name: "罗仪",
-          count: 33,
-          rank: 6,
-          gift: 0,
-          view: 1065
-        },
-        {
-          id: 10,
-          img: "../../static/images/item2.png",
-          name: "k9506张锦泽",
-          count: 7,
-          rank: 15,
-          gift: 0,
-          view: 253
-        }
-      ],
-      first: null,
-      second: null,
-      third: null,
+      first: {},
+      second: {},
+      third: {},
       newList: []
     };
   },
@@ -166,6 +74,7 @@ export default {
     callback() {
       this.isEnd = false;
     },
+    // 获得倒计时数据
     getData() {
       this.$fly
         .post(this.$api.index, {
@@ -176,14 +85,24 @@ export default {
           let data = res.data.data.hdActivity;
           this.endTime = data.end;
         });
+    },
+    // 获得排行榜数据
+    getList() {
+      this.$fly
+        .post(this.$api.rank, {
+          activityId: 1
+        })
+        .then(res => {
+          this.first = res.data.data.playerList[0];
+          this.second = res.data.data.playerList[1];
+          this.third = res.data.data.playerList[2];
+          this.newList = res.data.data.playerList1;
+        });
     }
   },
   onLoad() {
     this.getData();
-    this.first = this.list[0];
-    this.second = this.list[1];
-    this.third = this.list[2];
-    this.newList = this.list.filter((item, index) => index > 2);
+    this.getList();
   }
 };
 </script>

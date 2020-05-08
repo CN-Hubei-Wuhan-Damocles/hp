@@ -11,7 +11,7 @@
     <div class="detail-show">
       <!-- 排名 -->
       <div>
-        <span>{{ detailObj.rank }}</span>
+        <span>{{ detailObj.i }}</span>
         <span>排名</span>
       </div>
       <!-- 票数 -->

@@ -22,9 +22,15 @@
       <div class="vote-love">
         <scroll-view scroll-y="true" scrollbar-face-color="red" class="vote-view">
           <view id="demo" class="scroll-view-item demo-text">
-            <img src="../../../static/images/love.jpg" />
-            <span>喜欢我的人 在这里驻留</span>
-            <div @click="handleClick3">送ta礼物加票</div>
+            <img src="../../../static/images/love.jpg" v-if="flag" />
+            <span v-if="flag">喜欢我的人 在这里驻留</span>
+            <div @click="handleClick3" v-if="flag" class="toGift">送ta礼物加票</div>
+            <!-- 贡献信息 -->
+            <div v-for="item in contribution" :key="key" v-if="!flag" class="contribution">
+              <img :src="item.extend3" />
+              <span>{{ item.extend2 }}</span>
+              <span>{{ item.ticket }}票</span>
+            </div>
           </view>
         </scroll-view>
       </div>
@@ -35,14 +41,14 @@
       <div>
         <div v-for="item in voteList" :key="key" class="voteList">
           <div>
-            <span>{{ item.name }}</span>
+            <span>{{ item.extend2 }}</span>
             <span>+1</span>
           </div>
-          <span>{{ item.cTime }}</span>
+          <span>{{ item.createTime }}</span>
         </div>
       </div>
       <div class="vote-more">
-        <button type="default">查看更多</button>
+        <button type="default" @click="loadMore">{{ voteTitle?'已经是最后一页了':'查看更多' }}</button>
       </div>
     </div>
     <!-- tabbar内容 -->
@@ -75,18 +81,17 @@ export default {
   data() {
     return {
       // 分组数据
-      list: [],
-      detailObj: {
-        describes: ""
-      },
+      detailObj: {},
+      // 票数贡献榜,有就显示贡献信息,没有显示默认界面
+      contribution: [],
+      flag: true,
       // 投票记录
-      voteList: [
-        { id: 1, name: "undefined", cTime: "2019-12-27 10:24:28" },
-        { id: 1, name: "undefined", cTime: "2019-10-14 13:45:58" },
-        { id: 1, name: "汪琼", cTime: "2019-09-09 08:10:48" },
-        { id: 1, name: "张健", cTime: "2019-08-25 12:04:18" },
-        { id: 1, name: "蔡艳", cTime: "2019-08-16 16:04:28" }
-      ]
+      voteList: [],
+      pageSize: 5,
+      pageNum: 1,
+      voteFlag: false, // 控制更多点击事件
+      voteTitle: false,
+      id: 0 // 加载更多需要用到选手的id
     };
   },
   methods: {
@@ -104,21 +109,72 @@ export default {
         url: `../gift/main?id=${_this.detailObj.id}`
       });
     },
-    // 全部成员数据
+    // 选手详情数据
     getList(id) {
       this.$fly
-        .post(this.$api.allList, {
-          activityId: 1
+        .post(this.$api.perDetail, {
+          activityId: 1,
+          id: id
         })
         .then(res => {
-          this.list = res.data.rows;
-          this.detailObj = this.list.find(item => item.id == id);
+          this.detailObj = res.data.data.player;
+          let hdPlayerGiftlist = res.data.data.hdPlayerGiftlist;
+          if (hdPlayerGiftlist.length == 0) {
+            this.flag = true;
+          } else {
+            this.flag = false;
+            this.contribution = hdPlayerGiftlist;
+          }
         });
+    },
+    // 投票记录--选手
+    getVote(id) {
+      // 设锁
+      if (this.voteFlag) return;
+      this.voteFlag = true;
+      this.$fly
+        .post(this.$api.voteData, {
+          playerId: id,
+          pageSize: this.pageSize,
+          pageNum: this.pageNum
+        })
+        .then(res => {
+          res.data.rows.map(item => {
+            this.voteList.push(item);
+          });
+          // 开锁
+          this.voteFlag = false;
+          // 数据加载完
+          if (this.detailObj.ticket) {
+            if (this.detailObj.ticket == this.voteList.length) {
+              this.voteFlag = true;
+              this.voteTitle = true;
+            }
+          }
+          // 0票情况
+          if (this.voteList.length == 0) {
+            this.voteTitle = true;
+          }
+        });
+    },
+    // 查看更多
+    loadMore() {
+      this.pageNum++;
+      this.getVote(this.id);
     }
   },
   onLoad(options) {
     let id = options.id;
-    this.getList(id);
+    this.id = id;
+  },
+  onShow() {
+    // 每次打开页面初始化
+    this.voteList = [];
+    this.pageNum = 1;
+    this.voteFlag = false;
+    this.voteTitle = false;
+    this.getList(this.id);
+    this.getVote(this.id);
   }
 };
 </script>
@@ -176,19 +232,19 @@ export default {
   box-sizing: border-box;
 }
 .scroll-view-item {
-  height: 1000rpx;
+  min-height: 500rpx;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
-.vote-love img {
+.scroll-view-item > img {
   width: 200rpx;
   height: 200rpx;
 }
-.vote-love span {
+.scroll-view-item > span {
   font-size: 24rpx;
 }
-.vote-love div {
+.scroll-view-item > div.toGift {
   width: 70%;
   height: 90rpx;
   line-height: 90rpx;
@@ -230,6 +286,30 @@ export default {
 .vote-more > button {
   color: white;
   background-color: rgb(49, 201, 177);
+}
+.contribution {
+  width: 100%;
+  height: 120rpx;
+  line-height: 120rpx;
+  border-bottom: 1px solid #eeeeee;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+.contribution img {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  margin-left: 20rpx;
+  margin-right: 80rpx;
+}
+.contribution span {
+  font-size: 28rpx;
+}
+.contribution span:nth-child(3) {
+  color: rgb(49, 201, 177);
+  position: absolute;
+  right: 80rpx;
 }
 /* tabbar */
 .tabbarCon {
