@@ -117,10 +117,10 @@ export default {
         });
       } else {
         let name = this.user; // 姓名
-        let coursecheckboxs = JSON.stringify(this.globalData.value4); // 选择我们学校的原因
+        let coursecheckboxs = this.globalData.value4; // 选择我们学校的原因
         let whychoose = this.globalData.value4_text || "";
         let course = this.globalData.value1; // 选择的课程
-        let checkboxs = JSON.stringify(this.globalData.value2); // 最看重哪些方面
+        let checkboxs = this.globalData.value2; // 最看重哪些方面
         let qita = this.globalData.value2_text || "";
         let ordius = this.globalData.value3; // 报名渠道
         let why = this.globalData.value3_text || "";
@@ -128,12 +128,10 @@ export default {
         let zxordius = this.globalData.value6; // 对咨询是否满意
         let yuanyin = this.globalData.value6_text || ""; // 不满意的原因
         let professors = this.globalData.value8; //学历
-        let isfresh = JSON.stringify(
-          this.globalData.value7 == "应届" ? true : false
-        ); //是否是应届生
-        let sex = this.sex; // 性别
+        let isfresh = this.globalData.value7; //是否是应届生
+        let sex = this.sex == "男" ? "0" : "1"; // 性别
         let born = this.dateYear + "-" + this.dateMonth + "-" + this.date; // 出生日期
-        let tel = this.phone; // 电话
+        let tel = Number(this.phone); // 电话
         this.$fly
           .post(this.$api.asked, {
             questionnaireId: 2,

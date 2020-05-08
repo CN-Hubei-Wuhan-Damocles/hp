@@ -14,7 +14,7 @@
       <div class="selectedBox">
         <radio-group class="radio-group" @change="radioChange">
           <label class="radio" v-for="(item, index) in items" :key="key">
-            <radio :value="item.value" :checked="item.checked" />
+            <radio :value="item.id" :checked="item.checked" />
             {{item.type+". "+item.value}}
           </label>
         </radio-group>
@@ -32,7 +32,10 @@ export default {
   name: "selected1",
   data() {
     return {
-      items: [{ type: "A", value: "应届" }, { type: "B", value: "非应届" }]
+      items: [
+        { id: 1, type: "A", value: "应届" },
+        { id: 2, type: "B", value: "非应届" }
+      ]
     };
   },
   methods: {
@@ -42,7 +45,7 @@ export default {
         item.checked = false;
       });
       // 切换勾选状态
-      let index = this.items.findIndex(item => item.value == e.mp.detail.value);
+      let index = this.items.findIndex(item => item.id == e.mp.detail.value);
       this.items[index].checked = true;
       this.globalData.value7 = e.mp.detail.value;
     },

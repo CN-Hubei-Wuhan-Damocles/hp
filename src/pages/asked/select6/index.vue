@@ -14,7 +14,7 @@
       <div class="selectedBox">
         <radio-group class="radio-group" @change="radioChange">
           <label class="radio" v-for="(item, index) in items" :key="key">
-            <radio :value="item.value" :checked="item.checked" />
+            <radio :value="item.id" :checked="item.checked" />
             {{item.type+". "+item.value}}
           </label>
         </radio-group>
@@ -37,10 +37,10 @@ export default {
   data() {
     return {
       items: [
-        { type: "A", value: "非常满意" },
-        { type: "B", value: "满意" },
-        { type: "C", value: "一般" },
-        { type: "D", value: "不满意(原因必填)" }
+        { id: 1, type: "A", value: "非常满意" },
+        { id: 2, type: "B", value: "满意" },
+        { id: 3, type: "C", value: "一般" },
+        { id: 4, type: "D", value: "不满意(原因必填)" }
       ],
       // 其他文本控制数据
       isOther: false,
@@ -54,11 +54,11 @@ export default {
         item.checked = false;
       });
       // 切换勾选状态
-      let index = this.items.findIndex(item => item.value == e.mp.detail.value);
+      let index = this.items.findIndex(item => item.id == e.mp.detail.value);
       this.items[index].checked = true;
       this.globalData.value6 = e.mp.detail.value;
       // 判断选项是否为不满意
-      if (e.mp.detail.value == "不满意(原因必填)") {
+      if (e.mp.detail.value == "4") {
         this.isOther = true;
       } else {
         // 文本数据初始化
@@ -74,7 +74,7 @@ export default {
           duration: 2000
         });
       } else {
-        if (this.globalData.value6 == "不满意(原因必填)") {
+        if (this.globalData.value6 == "4") {
           if (this.otherText == "") {
             wx.showToast({
               title: "请输入原因",

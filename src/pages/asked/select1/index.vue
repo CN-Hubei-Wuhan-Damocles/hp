@@ -14,7 +14,7 @@
       <div class="selectedBox">
         <radio-group class="radio-group" @change="radioChange">
           <label class="radio" v-for="(item, index) in items" :key="key">
-            <radio :value="item.value" :checked="item.checked" />
+            <radio :value="item.id" :checked="item.checked" />
             {{item.type+". "+item.value}}
           </label>
         </radio-group>
@@ -33,15 +33,15 @@ export default {
   data() {
     return {
       items: [
-        { type: "A", value: "软件工程师" },
-        { type: "B", value: "ACCP" },
-        { type: "C", value: "北美大数据工程师" },
-        { type: "D", value: "JAVA中级程序员" },
-        { type: "E", value: "互联网架构师" },
-        { type: "F", value: "Web前端工程师" },
-        { type: "G", value: "UI设计师" },
-        { type: "H", value: "Python工程师" },
-        { type: "I", value: "云计算工程师" }
+        { id: 1, type: "A", value: "软件工程师" },
+        { id: 2, type: "B", value: "ACCP" },
+        { id: 3, type: "C", value: "北美大数据工程师" },
+        { id: 4, type: "D", value: "JAVA中级程序员" },
+        { id: 5, type: "E", value: "互联网架构师" },
+        { id: 6, type: "F", value: "Web前端工程师" },
+        { id: 7, type: "G", value: "UI设计师" },
+        { id: 8, type: "H", value: "Python工程师" },
+        { id: 9, type: "I", value: "云计算工程师" }
       ]
     };
   },
@@ -52,7 +52,7 @@ export default {
         item.checked = false;
       });
       // 切换勾选状态
-      let index = this.items.findIndex(item => item.value == e.mp.detail.value);
+      let index = this.items.findIndex(item => item.id == e.mp.detail.value);
       this.items[index].checked = true;
       this.globalData.value1 = e.mp.detail.value;
     },
