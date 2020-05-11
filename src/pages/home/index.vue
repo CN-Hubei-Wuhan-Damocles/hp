@@ -39,7 +39,7 @@
       <!-- 活动倒计时 -->
       <div class="ctime">
         <span>距离活动结束：</span>
-        <CTime :endTime="end" :endText="endText" :callback="callback"></CTime>
+        <CTime :endTime="end" :endText="endText"></CTime>
       </div>
       <!-- 搜索 -->
       <div class="search">
@@ -154,10 +154,6 @@ export default {
       wx.navigateTo({
         url: "../sign/main"
       });
-    },
-    // 倒计时回调函数
-    callback() {
-      this.isEnd = false;
     },
     // 音乐播放暂停
     changeMusic() {

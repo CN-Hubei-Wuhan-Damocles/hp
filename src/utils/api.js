@@ -20,6 +20,16 @@ let sign = "/applet/activity/add"
 let isLogin = "/applet/activity/groupList"
 // 问卷调查接口
 let asked = "/applet/activity/addHdInfogiftlog"
+// 给选手投票接口
+let addTicket = "/applet/activity/vote"
+// 礼物接口
+let giftList = "/applet/activity/giftList"
+// 支付接口
+let payWeixin = "/applet/pay/wxMiniProgramPay"
+// 支付成功后回传用户信息
+let backUserMsg = "/applet/activity/giftVote"
+//  确认订单是否回调成功
+let orderConfirm = "/applet/pay/orderConfirm"
 export default {
     openId,
     index,
@@ -31,5 +41,10 @@ export default {
     voteData,
     sign,
     isLogin,
-    asked
+    asked,
+    addTicket,
+    giftList,
+    payWeixin,
+    backUserMsg,
+    orderConfirm
 }

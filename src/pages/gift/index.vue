@@ -6,12 +6,12 @@
     <!-- 礼物部分 -->
     <div class="gift">
       <div class="giftList">
-        <div v-for="item in giftList" :key="key" @click="handleClick(item.giftId)">
-          <div class="giftShow" :class="{ active: item.giftId==current }">
+        <div v-for="item in giftList" :key="key" @click="handleClick(item.id)">
+          <div class="giftShow" :class="{ active: item.id==current }">
             <span>{{ item.name }}</span>
-            <img :src="item.img" />
+            <img :src="item.icon" />
             <!-- <img src="../../../static/images/gift1.png" /> -->
-            <div class="giftCount">+{{ item.count }}票</div>
+            <div class="giftCount">+{{ item.ticket }}票</div>
           </div>
         </div>
       </div>
@@ -30,13 +30,14 @@
     </div>
     <!-- 立即送出按钮 -->
     <div class="giftBtn">
-      <button type="primary">立即送出</button>
+      <button type="primary" @click="payMoney">立即送出</button>
     </div>
   </div>
 </template>
 
 <script>
 import Per from "../../components/per";
+import Store from "../../utils/store";
 export default {
   name: "gift",
   components: {
@@ -45,92 +46,27 @@ export default {
   data() {
     return {
       // 分组数据
-      list: [],
-      giftObj: {
-        coverImg: ""
-      },
+      giftObj: {},
       // 礼物数据
-      giftList: [
-        {
-          giftId: 1,
-          name: "棒棒糖",
-          img: "../../static/images/gift1.png",
-          price: "6",
-          count: 20
-        },
-        {
-          giftId: 2,
-          name: "花花",
-          img: "../../static/images/gift2.png",
-          price: "18",
-          count: 65
-        },
-        {
-          giftId: 3,
-          name: "么么哒",
-          img: "../../static/images/gift3.png",
-          price: "25",
-          count: 99
-        },
-        {
-          giftId: 4,
-          name: "666",
-          img: "../../static/images/gift4.png",
-          price: "50",
-          count: 240
-        },
-        {
-          giftId: 5,
-          name: "告白气球",
-          img: "../../static/images/gift5.png",
-          price: "98",
-          count: 550
-        },
-        {
-          giftId: 6,
-          name: "小心心",
-          img: "../../static/images/gift6.png",
-          price: "168",
-          count: 1000
-        },
-        {
-          giftId: 7,
-          name: "神灯",
-          img: "../../static/images/gift7.png",
-          price: "258",
-          count: 2188
-        },
-        {
-          giftId: 8,
-          name: "皇冠",
-          img: "../../static/images/gift8.png",
-          price: "328",
-          count: 2888
-        },
-        {
-          giftId: 9,
-          name: "宝箱",
-          img: "../../static/images/gift9.png",
-          price: "648",
-          count: 6888
-        }
-      ],
-      current: 1,
+      giftList: [],
+      current: 0,
       giftListObj: null,
       // 礼物数量
-      num: 1,
+      num: 0,
+      id: 0, // 礼物id
       totalPrice: null,
-      totalCount: null
+      totalCount: null,
+      // 选手id
+      playId: 0
     };
   },
   computed: {},
   methods: {
-    handleClick(id = 1) {
+    handleClick(id) {
       this.current = id;
-      this.giftListObj = this.giftList.find(
-        item => item.giftId == this.current
-      );
+      this.giftListObj = this.giftList.find(item => item.id == this.current);
       this.num = 1;
+      this.id = id;
       this.changeTotal();
     },
     sub() {
@@ -185,24 +121,110 @@ export default {
     // 总价总数量
     changeTotal() {
       this.totalPrice = this.giftListObj.price * this.num;
-      this.totalCount = this.giftListObj.count * this.num;
+      this.totalCount = this.giftListObj.ticket * this.num;
+      // 总价小数点的bug
+      if (this.giftListObj.price < 1) {
+        this.totalPrice = this.totalPrice.toFixed(2);
+      }
     },
-    // 全部成员数据
-    getList(id) {
+    // 礼物接口
+    getList() {
       this.$fly
-        .post(this.$api.allList, {
-          activityId: 1
+        .post(this.$api.giftList, {
+          activityId: 1,
+          id: this.playId
         })
         .then(res => {
-          this.list = res.data.rows;
-          this.giftObj = this.list.find(item => item.id == id);
+          this.giftObj = res.data.data.player;
+          this.giftList = res.data.data.hdGift;
+          // 默认礼物为第一个
+          this.handleClick(res.data.data.hdGift[0].id);
         });
+    },
+    // 立即送出
+    payMoney() {
+      let _this = this;
+      let price = _this.totalPrice * 100; // 微信以分计算，当前金额需要*100;
+      wx.login({
+        success(res) {
+          if (res.code) {
+            //支付接口请求
+            _this.$fly
+              .post(_this.$api.payWeixin, {
+                total_fee: price,
+                js_code: res.code
+              })
+              .then(res => {
+                if (res.data.code == 0) {
+                  wx.requestPayment({
+                    timeStamp: res.data.data.timeStamp,
+                    nonceStr: res.data.data.nonceStr,
+                    package: res.data.data.package,
+                    signType: res.data.data.signType,
+                    paySign: res.data.data.paySign,
+                    success(result) {
+                      // 支付成功
+                      let value = Store.getItem("openid"); // openid
+                      let nickName = Store.getItem("userMsg").nickName; // 用户名
+                      let avatarUrl = Store.getItem("userMsg").avatarUrl; // 用户信息
+                      // 回传用户信息
+                      _this.$fly
+                        .post(_this.$api.backUserMsg, {
+                          extend1: value,
+                          extend2: nickName,
+                          extend3: avatarUrl,
+                          playerId: _this.playId,
+                          giftId: _this.id,
+                          quantity: JSON.stringify(_this.num),
+                          amount: price,
+                          ticket: _this.totalCount,
+                          activityId: 1
+                        })
+                        .then(res => {
+                          // console.log(res);
+                        })
+                        .catch(err => {
+                          // console.log(err);
+                        });
+                      // 确认订单是否回调成功
+                      _this.$fly
+                        .post(_this.$api.orderConfirm, {
+                          orderId: res.data.data.orderId
+                        })
+                        .then(res => {
+                          // console.log(res);
+                          if (res.data.code == 0) {
+                            _this.getList();
+                          }
+                        })
+                        .catch(err => {
+                          console.log(err);
+                        });
+                    },
+                    fail(err) {
+                      console.log(err);
+                    }
+                  });
+                } else {
+                  wx.showToast({
+                    title: res.data.msg,
+                    icon: "none",
+                    duration: 2000
+                  });
+                }
+              });
+          } else {
+            console.log("登录失败！" + res.errMsg);
+          }
+        }
+      });
     }
   },
   onLoad(options) {
     let id = options.id;
-    this.getList(id);
-    this.handleClick();
+    id = 1;
+    this.playId = id;
+    this.getList();
   }
 };
 </script>
@@ -259,7 +281,6 @@ export default {
 .giftShow > img {
   width: 120rpx;
   height: 120rpx;
-  margin-top: 10rpx;
 }
 .giftCount {
   position: absolute;

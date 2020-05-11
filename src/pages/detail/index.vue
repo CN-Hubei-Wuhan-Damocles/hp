@@ -73,6 +73,7 @@
 
 <script>
 import Per from "../../components/per";
+import Store from "../../utils/store";
 export default {
   name: "detail",
   components: {
@@ -101,7 +102,30 @@ export default {
       });
     },
     handleClick2() {
-      console.log(22);
+      let openid = Store.getItem("openid");
+      let nickName = Store.getItem("nickName");
+      this.$fly
+        .post(this.$api.addTicket, {
+          extend1: openid,
+          extend2: nickName,
+          extend3: 1,
+          playerId: this.detailObj.id
+        })
+        .then(res => {
+          console.log(res);
+          if (res.data.success) {
+            wx.showToast({
+              title: "处理成功",
+              icon: "success",
+              duration: 2000
+            });
+          } else {
+            wx.showModal({
+              title: "提示",
+              content: res.data.message
+            });
+          }
+        });
     },
     handleClick3() {
       let _this = this;

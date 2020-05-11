@@ -137,8 +137,9 @@ export default {
         // 切换隐藏页面
         this.isHide = !this.isHide;
         // 同时将用户信息和openId数据一起返回给后台
-        let openid = Store.getItem("openid");
-        console.log(openid);
+        // let openid = Store.getItem("openid");
+        // console.log(openid);
+        Store.setItem("userMsg", userMsg);
       } else {
         //用户按了取消按钮
         wx.showModal({
